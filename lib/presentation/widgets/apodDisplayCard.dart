@@ -27,7 +27,7 @@ class _ApodCardState extends State<ApodCard> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildImage(widget.apodModel.hdurl,widget.apodModel.title),
+          _buildImage(widget.apodModel.url,widget.apodModel.title),
           const SizedBox(height: 10),
           Text(widget.apodModel.title, style: const TextStyle(fontSize: 20)),
           Text(widget.apodModel.copyright, style: const TextStyle(fontSize: 18)),

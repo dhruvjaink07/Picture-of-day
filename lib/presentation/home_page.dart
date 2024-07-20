@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:hive/hive.dart';
 import 'package:internet_connection_checker/internet_connection_checker.dart';
 import 'package:picture_of_day/controllers/apod_controller.dart';
 import 'package:picture_of_day/data/apod_model.dart';
+import 'package:picture_of_day/data/saved_apod_model.dart';
 import 'package:picture_of_day/presentation/widgets/apodDisplayCard.dart';
+import 'package:picture_of_day/presentation/widgets/drawer.dart';
+import 'package:picture_of_day/presentation/widgets/toast.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -12,12 +16,13 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> {
+class _HomePageState extends State<HomePage> with TickerProviderStateMixin {
 
   late Future<List<ApodModel>> _apodFuture;
   bool isOnline = true;
+  late IconData iconData;
   final APODController _apodController = APODController();
-
+  Box box = Hive.box('saved');
   Future<void> isDeviceConnected() async {
     bool isConnected = await InternetConnectionChecker().hasConnection;
     setState(() {
@@ -29,6 +34,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     isDeviceConnected();
+    iconData= Icons.bookmark_add;
     _apodFuture = _apodController.getApodData(1);
   }
 
@@ -37,23 +43,41 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _apodFuture = _apodController.getApodData(1);
     });
+    Toast.showToast("Data Refreshed");
   }
+  final GlobalKey<ScaffoldState> key = GlobalKey<ScaffoldState>();
   @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: Scaffold(
+        key: key,
+        drawer: MenuDrawer(pageName: "Home",),
         appBar: AppBar(
-          title: Text("Astronomy Picture of The Day"),
+          leading: IconButton(onPressed: (){
+            key.currentState!.openDrawer();
+          }, icon: const Icon(Icons.menu)),
+          title: const Text("Astronomy Picture of The Day"),
           actions:[
-            
+            GestureDetector(
+              onTap: (){
+                setState(() {
+                  iconData = Icons.bookmark;
+                });
+              },
+              child: Icon(iconData)),
+              const SizedBox(width: 5,)
           ]
         ),
         body: SizedBox(
           height: MediaQuery.of(context).size.height,
-          width: MediaQuery.of(context).size.width,
+          width: MediaQuery.of(context).size.width ,
           child: isOnline
               ? GestureDetector(
-                
+                onPanUpdate: (details){
+                  if(details.delta.dx < 0){
+                    refreshData();
+                  }
+                },
                 child: FutureBuilder<List<ApodModel>>(
                     future: _apodFuture,
                     builder: (context, snapshot) {
@@ -68,7 +92,14 @@ class _HomePageState extends State<HomePage> {
                         return ListView.builder(
                           itemCount: apodList.length,
                           itemBuilder: (context, index) {
-                            return ApodCard(apodModel: apodList[index]);
+                            return GestureDetector(
+                              onPanUpdate: (details){
+                                if(details.delta.dx >0){
+                                  box.add(SavedApodModel(copyright: apodList[0].copyright, date: apodList[0].date, explanation: apodList[0].explanation, hdurl: apodList[0].hdurl, mediaType: apodList[0].mediaType, title: apodList[0].title, url: apodList[0].url));
+                                  Toast.showToast("Saved To Collections");
+                                }
+                              },
+                              child: ApodCard(apodModel: apodList[index]));
                           },
                         );
                       } else {
@@ -86,13 +117,6 @@ class _HomePageState extends State<HomePage> {
                     ],
                   ),
                 ),
-        ),
-        floatingActionButton: FloatingActionButton(
-          onPressed: refreshData,
-          child: const Icon(
-            Icons.refresh,
-            color: Colors.black,
-          ),
         ),
       ),
     );
