@@ -13,7 +13,6 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  static const platform = MethodChannel("toast.flutter.io/toast");
 
   late Future<List<ApodModel>> _apodFuture;
   bool isOnline = true;
@@ -38,13 +37,7 @@ class _HomePageState extends State<HomePage> {
     setState(() {
       _apodFuture = _apodController.getApodData(1);
     });
-    showToast("Data refreshed");
   }
-
-  void showToast(String message) {
-    platform.invokeMethod("showToast", {"message": message});
-  }
-
   @override
   Widget build(BuildContext context) {
     return SafeArea(
@@ -59,28 +52,31 @@ class _HomePageState extends State<HomePage> {
           height: MediaQuery.of(context).size.height,
           width: MediaQuery.of(context).size.width,
           child: isOnline
-              ? FutureBuilder<List<ApodModel>>(
-                  future: _apodFuture,
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return const Center(
-                        child: CircularProgressIndicator(),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (snapshot.hasData) {
-                      List<ApodModel> apodList = snapshot.data!;
-                      return ListView.builder(
-                        itemCount: apodList.length,
-                        itemBuilder: (context, index) {
-                          return ApodCard(apodModel: apodList[index]);
-                        },
-                      );
-                    } else {
-                      return const Center(child: Text('No data available'));
-                    }
-                  },
-                )
+              ? GestureDetector(
+                
+                child: FutureBuilder<List<ApodModel>>(
+                    future: _apodFuture,
+                    builder: (context, snapshot) {
+                      if (snapshot.connectionState == ConnectionState.waiting) {
+                        return const Center(
+                          child: CircularProgressIndicator(),
+                        );
+                      } else if (snapshot.hasError) {
+                        return Center(child: Text('Error: ${snapshot.error}'));
+                      } else if (snapshot.hasData) {
+                        List<ApodModel> apodList = snapshot.data!;
+                        return ListView.builder(
+                          itemCount: apodList.length,
+                          itemBuilder: (context, index) {
+                            return ApodCard(apodModel: apodList[index]);
+                          },
+                        );
+                      } else {
+                        return const Center(child: Text('No data available'));
+                      }
+                    },
+                  ),
+              )
               : const Center(
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,

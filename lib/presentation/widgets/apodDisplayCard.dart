@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:image_gallery_saver/image_gallery_saver.dart';
 import 'package:picture_of_day/data/apod_model.dart';
+import 'package:picture_of_day/presentation/widgets/toast.dart';
 import 'package:screenshot/screenshot.dart';
 
 class ApodCard extends StatefulWidget {
@@ -47,7 +48,7 @@ class _ApodCardState extends State<ApodCard> {
             if (image != null) {
               final result = await ImageGallerySaver.saveImage(image,name: imageName);
               print("Screenshot saved to gallery: $result");
-              showToast("Image Saved to Gallery");
+              Toast.showToast("Image Saved to Gallery");
             }
           } catch (e) {
             print("Error capturing screenshot: $e");
@@ -68,8 +69,5 @@ class _ApodCardState extends State<ApodCard> {
     } else {
       return Image.asset('assets/default_image.png'); // Provide your own default image asset path
     }
-  }
-    void showToast(String message) {
-    platform.invokeMethod("showToast", {"message": message});
   }
 }
