@@ -24,15 +24,20 @@ class _ApodCardState extends State<ApodCard> {
     String url = widget.apodModel.url;
     String hdurl = widget.apodModel.hdurl;
     return Container(
+      width: double.infinity,
+      padding: const EdgeInsets.symmetric(horizontal: 5),
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
-      child: Column(
+      child: Column(  
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           _buildImage((url.isNotEmpty)?url: hdurl,widget.apodModel.title),
           const SizedBox(height: 10),
           Text(widget.apodModel.title, style: const TextStyle(fontSize: 20)),
-          Text(widget.apodModel.copyright, style: const TextStyle(fontSize: 18)),
+          Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              child: Text("- ${widget.apodModel.copyright}", style: const TextStyle(fontSize: 18),overflow: TextOverflow.fade,))),
           const SizedBox(height: 10),
           Text("Explanation: ${widget.apodModel.explanation}"),
           const SizedBox(height: 20),

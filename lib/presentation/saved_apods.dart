@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:picture_of_day/data/apod_model.dart';
+import 'package:picture_of_day/presentation/home_page.dart';
 import 'package:picture_of_day/presentation/widgets/drawer.dart';
 import 'package:hive/hive.dart';
 import 'package:picture_of_day/data/saved_apod_model.dart';
@@ -22,14 +23,15 @@ class _SavedApodsState extends State<SavedApods> {
     super.initState();
     // Open the Hive box and fetch saved APOD data
     box = Hive.box<SavedApodModel>("saved");
-    savedApodList = box.values.toList().toSet().toList();
+    savedApodList = box.values.toList().toSet().toList().reversed.toList();
+
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       key: key,
-      drawer: MenuDrawer(pageName: "SavedApods"),
+      drawer: const MenuDrawer(pageName: "collection"),
       appBar: AppBar(
         leading: IconButton(
           onPressed: () {
@@ -37,17 +39,23 @@ class _SavedApodsState extends State<SavedApods> {
           },
           icon: const Icon(Icons.menu),
         ),
-        title: const Text("Saved Pages"),
+        title: const Text("Collection"),
       ),
-      body: savedApodList.isNotEmpty
-          ? ListView.builder(
-            reverse: true,
-              itemCount: savedApodList.length,
-              itemBuilder: (context, index) {
-                return ApodCard(apodModel: savedApodList[index].toApodModel());
-              },
-            )
-          : const Center(child: Text("No saved APODs available")),
+      body: WillPopScope(
+        onWillPop: () async{
+          Navigator.pushReplacement(context, MaterialPageRoute(builder: (context)=>const HomePage()));
+          return true;
+        },
+        child: savedApodList.isNotEmpty
+            ? ListView.builder(
+        
+                itemCount: savedApodList.length,
+                itemBuilder: (context, index) {
+                  return ApodCard(apodModel: savedApodList[index].toApodModel());
+                },
+              )
+            : const Center(child: Text("No saved APODs available")),
+      ),
     );
   }
 }

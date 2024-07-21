@@ -13,7 +13,7 @@ class ApodCardShimmer extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Container(
           width: double.infinity,
-          height: 50.0,
+          height: 40.0,
           color: Colors.white,
         ),
       ),
@@ -21,7 +21,7 @@ class ApodCardShimmer extends StatelessWidget {
         padding: const EdgeInsets.all(8.0),
         child: Container(
           width: double.infinity,
-          height: 50.0,
+          height: 30.0,
           color: Colors.white,
         ),
       ),
