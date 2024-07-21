@@ -1,3 +1,4 @@
+import 'package:animated_text_kit/animated_text_kit.dart';
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -17,17 +18,18 @@ class ApodCard extends StatefulWidget {
 
 class _ApodCardState extends State<ApodCard> {
   ScreenshotController screenshotController = ScreenshotController();
-  static const platform = MethodChannel('toast.flutter.io/toast');
-
+  
   @override
   Widget build(BuildContext context) {
+    String url = widget.apodModel.url;
+    String hdurl = widget.apodModel.hdurl;
     return Container(
       margin: const EdgeInsets.all(5),
       decoration: BoxDecoration(borderRadius: BorderRadius.circular(5)),
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          _buildImage(widget.apodModel.url,widget.apodModel.title),
+          _buildImage((url.isNotEmpty)?url: hdurl,widget.apodModel.title),
           const SizedBox(height: 10),
           Text(widget.apodModel.title, style: const TextStyle(fontSize: 20)),
           Text(widget.apodModel.copyright, style: const TextStyle(fontSize: 18)),
@@ -56,18 +58,17 @@ class _ApodCardState extends State<ApodCard> {
         },
         child: Screenshot(
           controller: screenshotController,
-          child: InteractiveViewer(
-            maxScale: 5.0,
-            child: CachedNetworkImage(
-              imageUrl: url,
-              placeholder: (context, url) => const CircularProgressIndicator(),
-              errorWidget: (context, url, error) => const Icon(Icons.error),
-            ),
+          child: CachedNetworkImage(
+            imageUrl: url,
+            placeholder: (context, url) => const CircularProgressIndicator(),
+            errorWidget: (context, url, error) => const Icon(Icons.error),
           ),
         ),
       );
     } else {
-      return Image.asset('assets/default_image.png'); // Provide your own default image asset path
+    return Container(height: 200,width: 300,decoration: const BoxDecoration(color: Colors.grey),
+    child: Center(child: AnimatedTextKit(animatedTexts: [FadeAnimatedText("Image not Found!",textStyle: const TextStyle(color: Colors.red, fontSize: 24))],),),
+    );
     }
   }
 }

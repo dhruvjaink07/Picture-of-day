@@ -12,8 +12,10 @@ void main() async {
   await Hive.initFlutter();
   Hive.registerAdapter(SavedApodModelAdapter());
 
-  // Open the boxes
-  await Hive.openBox<SavedApodModel>("saved");
+  // Open the boxes if they are not already open
+  if (!Hive.isBoxOpen("saved")) {
+    await Hive.openBox<SavedApodModel>("saved");
+  }
 
   runApp(const MyApp());
 }

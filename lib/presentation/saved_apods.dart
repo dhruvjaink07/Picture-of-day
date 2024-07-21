@@ -22,7 +22,7 @@ class _SavedApodsState extends State<SavedApods> {
     super.initState();
     // Open the Hive box and fetch saved APOD data
     box = Hive.box<SavedApodModel>("saved");
-    savedApodList = box.values.toList();
+    savedApodList = box.values.toList().toSet().toList();
   }
 
   @override
@@ -41,6 +41,7 @@ class _SavedApodsState extends State<SavedApods> {
       ),
       body: savedApodList.isNotEmpty
           ? ListView.builder(
+            reverse: true,
               itemCount: savedApodList.length,
               itemBuilder: (context, index) {
                 return ApodCard(apodModel: savedApodList[index].toApodModel());
